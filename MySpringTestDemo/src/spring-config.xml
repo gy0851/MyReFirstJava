@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- spring的xml文件的schema导入的是xsd文件,该文件存在于spring的jar包当中，默认网址不通时Spring会从jar包中进行查找xsd文件-->
+<!-- 当需要添加aop或者其他功能时，只需要在xml的namespace标签里添加xmlns:aop的相关信息并在xsi:schemaLocation中引用相应地址即可-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+</beans>
