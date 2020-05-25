@@ -6,5 +6,24 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
-    <bean id = "student" class="com.ggyy0851.pojo.Student"/>
+    <bean id = "student" class="com.ggyy0851.pojo.Student">
+        <!-- ref引用另一个bean  value则是基本数据类型或者String之类 -->
+        <!-- name指定构造方法的形参名，index指定构造方法的第N个位置（从0开始），type指定这个形参的类型（int、long等）-->
+        <!-- 会根据符合条件的构造方法去进行匹配，否则会按照bean中能够匹配到的最下方的那一个构造方法进行匹配并传参-->
+        <constructor-arg value="张三" name="name" ></constructor-arg>
+        <constructor-arg value="123" name="id" ></constructor-arg>
+    </bean>
+    <!-- 由于有工厂模式，只需要指定由哪个BeanFactory来生产具体的Bean，甚至可以实现直接输入BeanId即可
+    生产步骤则交由Spring来进行处理 -->
+
+    <!-- 静态工厂则由于Spring加载时就已生成类，所以不需要通过factory-bean来索引，直接将class指向静态工厂
+    并调用factory-method获取相应实例即可 -->
+    <bean id = "factory" class="com.ggyy0851.factory.StudentFactory"/>
+    <bean id = "good_student" factory-bean="factory" factory-method="CreateStudent">
+        <constructor-arg index="0" value="1000"></constructor-arg>
+    </bean>
+    <bean id = "bad_student" factory-bean="factory" factory-method="CreateStudent">
+        <constructor-arg index="0" value="10"></constructor-arg>
+    </bean>
+    <bean id = "HenWater_student" class="com.ggyy0851.factory.HenWaterFactory" factory-method="getInstance"/>
 </beans>
