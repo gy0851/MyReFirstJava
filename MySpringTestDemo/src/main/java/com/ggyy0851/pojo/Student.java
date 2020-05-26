@@ -6,11 +6,30 @@ package com.ggyy0851.pojo;
  */
 public class Student {
     public Student(){};
+
+    public History getHistory() {
+        return history;
+    }
+
+    public void setHistory(History history) {
+        this.history = history;
+    }
+
+    private History history;
     public Student(String name) {
         super();
         this.name  = name;
     }
-    public Student(String name,String id){
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Student(String name, String id){
         super();
         this.id = id;
         this.name = name;
@@ -35,5 +54,15 @@ public class Student {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "history=" + history +
+                ", id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", level='" + level + '\'' +
+                '}';
     }
 }

@@ -7,10 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="MyFirstJava" />
+        <module name="MySpringTestDemo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="MyFirstJava" target="1.5" />
+      <module name="MyMaven" target="1.5" />
+      <module name="MySpringTestDemo" target="1.5" />
       <module name="Spring5TestDemo" target="1.5" />
     </bytecodeTargetLevel>
   </component>

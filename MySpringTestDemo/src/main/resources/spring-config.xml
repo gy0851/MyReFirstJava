@@ -6,6 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
+    <!-- 通过IoC的方式将他们交给Spring进行管理 -->
     <bean id = "student" class="com.ggyy0851.pojo.Student">
         <!-- ref引用另一个bean  value则是基本数据类型或者String之类 -->
         <!-- name指定构造方法的形参名，index指定构造方法的第N个位置（从0开始），type指定这个形参的类型（int、long等）-->
@@ -26,4 +27,43 @@
         <constructor-arg index="0" value="10"></constructor-arg>
     </bean>
     <bean id = "HenWater_student" class="com.ggyy0851.factory.HenWaterFactory" factory-method="getInstance"/>
+    <!-- 这里使用了DI，将history注入给normal_student -->
+    <bean id = "normal_student" class="com.ggyy0851.pojo.Student">
+        <!-- 简单数据类型可通过此种方式进行set注入 -->
+        <property name="id">
+            <value>10</value>
+        </property>
+        <property name="name">
+            <value>张三</value>
+        </property>
+        <property name="history" ref="history"/>
+    </bean>
+    <bean id = "history" class="com.ggyy0851.pojo.History">
+        <property name="score">
+            <set>
+                <value>10</value>
+                <value>20</value>
+                <value>30</value>
+            </set>
+        </property>
+        <property name="reward">
+            <list>
+                <value>茄子炒肉</value>
+                <value>棍棒教育</value>
+            </list>
+        </property>
+        <property name="life">
+            <array>
+                <value>被抢钱</value>
+                <value>被抢钱</value>
+                <value>被抢钱</value>
+            </array>
+        </property>
+        <property name="paper">
+            <map>
+                <entry key="数学" value="30"/>
+                <entry key="语文" value="40"/>
+            </map>
+        </property>
+    </bean>
 </beans>
