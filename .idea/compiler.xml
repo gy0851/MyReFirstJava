@@ -13,8 +13,10 @@
     <bytecodeTargetLevel>
       <module name="MyFirstJava" target="1.5" />
       <module name="MyMaven" target="1.5" />
+      <module name="MySpring5TestDemo" target="1.5" />
       <module name="MySpringTestDemo" target="1.5" />
       <module name="Spring5TestDemo" target="1.5" />
+      <module name="springdemo" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

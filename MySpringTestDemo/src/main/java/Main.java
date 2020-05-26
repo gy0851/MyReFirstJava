@@ -1,5 +1,5 @@
 import com.ggyy0851.pojo.Student;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context  .ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -31,5 +31,6 @@ public class Main {
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
         Student student4 = ac.getBean("normal_student",Student.class);
         System.out.print(student4.toString());
+        System.out.print("sdf");
     }
 }
