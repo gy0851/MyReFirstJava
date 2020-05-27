@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="mylib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/mybatis-3.4.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/spring-web-5.2.6.RELEASE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

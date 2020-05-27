@@ -6,7 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
-    <!-- 通过IoC的方式将他们交给Spring进行管理 -->
+    <!-- 通过IoC的方式将他们交给Spring进行管理 核心就context,core,bean和expression-->
     <bean id = "student" class="com.ggyy0851.pojo.Student">
         <!-- ref引用另一个bean  value则是基本数据类型或者String之类 -->
         <!-- name指定构造方法的形参名，index指定构造方法的第N个位置（从0开始），type指定这个形参的类型（int、long等）-->
@@ -66,4 +66,21 @@
             </map>
         </property>
     </bean>
+    <!-- 数据库的数据源配置 用于做数据源的是jdbc,orm,oxm,jms和transaction，属于spring数据管理层的包-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="url" value="jdbc://mysql://mydb:3306"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+    </bean>
+    <!-- 这是mybatis的用于给spring注册的包，属于mybatis包 -->
+    <bean id="databasefactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 这是mybatis的用于给Spring管理mybatis的各类配置文件的包 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ggyy0851.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="databasefactory"/>
+    </bean>
+    <!-- 由于Scanner把相应mapper的类/接口等资源都加载了进来，此时可以直接使用ref去进行引用而不需要事先用bean去声明 -->
 </beans>
