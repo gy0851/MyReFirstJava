@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- spring的xml文件的schema导入的是xsd文件,该文件存在于spring的jar包当中，默认网址不通时Spring会从jar包中进行查找xsd文件-->
 <!-- 当需要添加aop或者其他功能时，只需要在xml的namespace标签里添加xmlns:aop的相关信息并在xsi:schemaLocation中引用相应地址即可-->
+<!-- xsi是IOC相关，aop是aop相关，tx是tx相关 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd">
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
     <!-- 通过IoC的方式将他们交给Spring进行管理 核心就context,core,bean和expression-->
     <bean id = "student" class="com.ggyy0851.pojo.Student">
@@ -83,4 +87,40 @@
         <property name="sqlSessionFactoryBeanName" value="databasefactory"/>
     </bean>
     <!-- 由于Scanner把相应mapper的类/接口等资源都加载了进来，此时可以直接使用ref去进行引用而不需要事先用bean去声明 -->
+    <!-- 将前置通知和后置通知注册成bean以便后续引用，用schema-base的方式，需要在各个通知中继承相应的接口才行 -->
+    <bean id="b1" class="com.ggyy0851.dosomething.Prepare"/>
+    <bean id="gc" class="com.ggyy0851.dosomething.GoClass"/>
+    <bean id="a1" class="com.ggyy0851.dosomething.GoHome"/>
+    <bean id="ex" class="com.ggyy0851.dosomething.DoWrong"/>
+    <bean id="ex2" class="com.ggyy0851.dosomething.DoWrong2" />
+    <!-- 基于Schema-based的配置方法 -->
+    <aop:config>
+        <!-- 注册切入点(精确到方法) -->
+        <!--此处如果需要传参，则需要用类execution(* com.package.class.method(type1,type2,type3..) and args(arg1,arg2,arg3..))的方式来使用-->
+        <!--*可匹配任意包、类、方法，匹配任意参数用 .. ，如无必要最好进行限定，否则会影响性能-->
+        <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.gotoClass())" id="p1"/>
+        <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.sleep())" id="p2"/>
+        <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.*())" id="p3"/>
+        <!-- 将切入点与前后通知关联起来 -->
+        <aop:advisor advice-ref="b1" pointcut-ref="p1"/>
+        <aop:advisor advice-ref="a1" pointcut-ref="p2"/>
+        <aop:advisor advice-ref="ex" pointcut-ref="p3"/>
+        <!-- 基于AspectJ的配置方法 -->
+        <!--配置切面-->
+        <aop:aspect ref="ex2">
+            <!--配置切点-->
+            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.*(..))" id="p4"/>
+            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.sleep())" id="p5"/>
+            <!-- AspectJ中的通知处理必须在配置文件/注解中进行明确，否则会匹配不上，比如当异常处理的参数是e时，此处的throwing也必须为e,否则会报绑定错误 -->
+            <aop:after-throwing method="MyWrong" pointcut-ref="p4" throwing="e" />
+            <!-- 配置前置通知 -->
+            <!-- <aop:before method="b1" pointcut-ref="p3" arg-names="英语"/>-->
+            <!-- 配置后置通知 -->
+            <!-- <aop:after method="gh" pointcut-ref="p4"/>-->
+            <!-- <aop:after-returning method="myaftering" pointcut-ref="mypoint"/> <aop:after-throwing method="mythrow" pointcut-ref="mypoint"/>-->
+            <!-- 配置环绕通知 -->
+            <!-- <aop:around method="myarround" pointcut-ref="mypoint"/>-->
+        </aop:aspect>
+    </aop:config>
+
 </beans>

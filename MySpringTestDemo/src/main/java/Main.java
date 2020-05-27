@@ -1,3 +1,4 @@
+import com.ggyy0851.dosomething.GoClass;
 import com.ggyy0851.pojo.Student;
 
 import org.springframework.context.ApplicationContext;
@@ -46,6 +47,11 @@ public class Main {
             System.out.println(str);
         }*/
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
-        ac.getBean("");
+        GoClass gc = ac.getBean("gc", GoClass.class);
+        gc.setScore("123");
+        gc.gotoClass("sdf");
+        gc.listen();
+        gc.sleep();
+
     }
 }

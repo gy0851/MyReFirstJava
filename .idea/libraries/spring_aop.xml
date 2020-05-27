@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="spring-aop">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/aspectjrt-1.9.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/aspectjweaver-1.9.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/cglib-3.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MySpringTestDemo/lib/spring-aop-5.2.6.RELEASE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
