@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MyFirstJava.iml" filepath="$PROJECT_DIR$/MyFirstJava.iml" />
       <module fileurl="file://$PROJECT_DIR$/MySpringTestDemo/MySpringTestDemo.iml" filepath="$PROJECT_DIR$/MySpringTestDemo/MySpringTestDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WebLittleTool/WebLittleTool.iml" filepath="$PROJECT_DIR$/WebLittleTool/WebLittleTool.iml" />
     </modules>
   </component>
 </project>
