@@ -4,6 +4,6 @@
  */
 public class Main {
     public static void main(String[] args){
-        System.out.print("重来，重新复习技术");
+        System.out.println("重来，重新复习技术");
     }
 }

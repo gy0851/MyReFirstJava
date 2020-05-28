@@ -1,5 +1,7 @@
 package com.ggyy0851.dosomething;
 
+import org.aspectj.lang.annotation.Pointcut;
+
 import javax.naming.Name;
 
 /**
@@ -22,13 +24,12 @@ public class GoClass {
         System.out.println("本体："+score);
     }
     public void gotoClass(String classname){
-        int a =6/0;
         System.out.println("去上课");
         System.out.println("本体："+score);
         System.out.println("上的课名叫："+ classname);
     }
     public void listen(){
-        System.out.println("上课");
+        System.out.println("听课");
     }
     public void sleep(){
         System.out.println("也是上课");

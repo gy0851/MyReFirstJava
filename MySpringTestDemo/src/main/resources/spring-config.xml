@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- spring的xml文件的schema导入的是xsd文件,该文件存在于spring的jar包当中，默认网址不通时Spring会从jar包中进行查找xsd文件-->
 <!-- 当需要添加aop或者其他功能时，只需要在xml的namespace标签里添加xmlns:aop的相关信息并在xsi:schemaLocation中引用相应地址即可-->
-<!-- xsi是IOC相关，aop是aop相关，tx是tx相关 -->
+<!-- xsi是IOC相关，aop是aop相关，tx是tx相关,context是注解相关 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop
-       http://www.springframework.org/schema/aop/spring-aop.xsd">
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 使用注解时需要使用context:component-scan来对包进行扫描，多个包可以用逗号分隔 -->
+    <!--  该包扫描器用于获取bean的注解，扫描该包下带有@component注解的类并将其注解为bean -->
+    <context:component-scan base-package="com.ggyy0851.doshomethingbyat"/>
+
+    <!-- proxy-target-class属性为"true"时，使用cglib动态进行代理，为false时为jdk动态代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
     <!-- 通过IoC的方式将他们交给Spring进行管理 核心就context,core,bean和expression-->
     <bean id = "student" class="com.ggyy0851.pojo.Student">
-        <!-- ref引用另一个bean  value则是基本数据类型或者String之类 -->
+
+        <!-- ref引用另一个bean，value则是基本数据类型或者String之类 -->
         <!-- name指定构造方法的形参名，index指定构造方法的第N个位置（从0开始），type指定这个形参的类型（int、long等）-->
         <!-- 会根据符合条件的构造方法去进行匹配，否则会按照bean中能够匹配到的最下方的那一个构造方法进行匹配并传参-->
         <constructor-arg value="张三" name="name" ></constructor-arg>
         <constructor-arg value="123" name="id" ></constructor-arg>
     </bean>
+
     <!-- 由于有工厂模式，只需要指定由哪个BeanFactory来生产具体的Bean，甚至可以实现直接输入BeanId即可
     生产步骤则交由Spring来进行处理 -->
 
@@ -25,14 +39,16 @@
     并调用factory-method获取相应实例即可 -->
     <bean id = "factory" class="com.ggyy0851.factory.StudentFactory"/>
     <bean id = "good_student" factory-bean="factory" factory-method="CreateStudent">
-        <constructor-arg index="0" value="1000"></constructor-arg>
+        <constructor-arg index="0" value="1000" ></constructor-arg>
     </bean>
     <bean id = "bad_student" factory-bean="factory" factory-method="CreateStudent">
         <constructor-arg index="0" value="10"></constructor-arg>
     </bean>
     <bean id = "HenWater_student" class="com.ggyy0851.factory.HenWaterFactory" factory-method="getInstance"/>
+
     <!-- 这里使用了DI，将history注入给normal_student -->
     <bean id = "normal_student" class="com.ggyy0851.pojo.Student">
+
         <!-- 简单数据类型可通过此种方式进行set注入 -->
         <property name="id">
             <value>10</value>
@@ -70,6 +86,7 @@
             </map>
         </property>
     </bean>
+
     <!-- 数据库的数据源配置 用于做数据源的是jdbc,orm,oxm,jms和transaction，属于spring数据管理层的包-->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="url" value="jdbc://mysql://mydb:3306"/>
@@ -77,49 +94,71 @@
         <property name="password" value="root"/>
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
     </bean>
+
     <!-- 这是mybatis的用于给spring注册的包，属于mybatis包 -->
     <bean id="databasefactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+
     <!-- 这是mybatis的用于给Spring管理mybatis的各类配置文件的包 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ggyy0851.mapper"/>
         <property name="sqlSessionFactoryBeanName" value="databasefactory"/>
     </bean>
+
     <!-- 由于Scanner把相应mapper的类/接口等资源都加载了进来，此时可以直接使用ref去进行引用而不需要事先用bean去声明 -->
     <!-- 将前置通知和后置通知注册成bean以便后续引用，用schema-base的方式，需要在各个通知中继承相应的接口才行 -->
     <bean id="b1" class="com.ggyy0851.dosomething.Prepare"/>
     <bean id="gc" class="com.ggyy0851.dosomething.GoClass"/>
     <bean id="a1" class="com.ggyy0851.dosomething.GoHome"/>
     <bean id="ex" class="com.ggyy0851.dosomething.DoWrong"/>
-    <bean id="ex2" class="com.ggyy0851.dosomething.DoWrong2" />
+    <bean id="do" class="com.ggyy0851.dosomething.DoThings" />
+    <bean id="around" class="com.ggyy0851.dosomething.Thinking"/>
+
     <!-- 基于Schema-based的配置方法 -->
     <aop:config>
+
         <!-- 注册切入点(精确到方法) -->
-        <!--此处如果需要传参，则需要用类execution(* com.package.class.method(type1,type2,type3..) and args(arg1,arg2,arg3..))的方式来使用-->
+        <!--此处如果需要传参，则需要用类execution(* com.package.class.method(type1,type2,type3..) and args(arg1,arg2,arg3..))的方式来使用(老版本spring)-->
+        <!-- spring5中用args关键字会导致各种问题，目前使用通过的方法是不加args关键字，但在通知中要加入相应参数 -->
         <!--*可匹配任意包、类、方法，匹配任意参数用 .. ，如无必要最好进行限定，否则会影响性能-->
         <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.gotoClass())" id="p1"/>
         <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.sleep())" id="p2"/>
         <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.*())" id="p3"/>
+        <aop:pointcut  expression="execution(* com.ggyy0851.dosomething.GoClass.listen())" id="p4"/>
+
         <!-- 将切入点与前后通知关联起来 -->
         <aop:advisor advice-ref="b1" pointcut-ref="p1"/>
         <aop:advisor advice-ref="a1" pointcut-ref="p2"/>
         <aop:advisor advice-ref="ex" pointcut-ref="p3"/>
+        <aop:advisor advice-ref="around" pointcut-ref="p4"/>
+
         <!-- 基于AspectJ的配置方法 -->
         <!--配置切面-->
-        <aop:aspect ref="ex2">
+        <aop:aspect ref="do">
+
+            <!-- 此处的配置顺序也会影响细微处的执行顺序，比如同样是前置，但配置在上的会先执行，在下的会后执行 -->
             <!--配置切点-->
-            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.*(..))" id="p4"/>
-            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.sleep())" id="p5"/>
+            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.gotoClass(..)) and args(String)" id="p7"/>
+            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.gotoClass())" id="p5"/>
+            <aop:pointcut expression="execution(* com.ggyy0851.dosomething.GoClass.sleep()" id="p6" />
+
             <!-- AspectJ中的通知处理必须在配置文件/注解中进行明确，否则会匹配不上，比如当异常处理的参数是e时，此处的throwing也必须为e,否则会报绑定错误 -->
-            <aop:after-throwing method="MyWrong" pointcut-ref="p4" throwing="e" />
+            <aop:after-throwing method="MyWrong" pointcut-ref="p5" throwing="e" />
+
             <!-- 配置前置通知 -->
-            <!-- <aop:before method="b1" pointcut-ref="p3" arg-names="英语"/>-->
+            <aop:before method="BeforeAdvice" pointcut-ref="p7" arg-names="name" />
+            <aop:before method="BeforeAdvice" pointcut-ref="p5" />
+
             <!-- 配置后置通知 -->
-            <!-- <aop:after method="gh" pointcut-ref="p4"/>-->
-            <!-- <aop:after-returning method="myaftering" pointcut-ref="mypoint"/> <aop:after-throwing method="mythrow" pointcut-ref="mypoint"/>-->
+            <!-- 不带returning关键字的后置通知在切点有无异常时都会执行 -->
+            <aop:after method="AfterAdvice" pointcut-ref="p5"/>
+
+            <!-- 带returning关键字的后置通知在切点无异常时才会正常执行，否则会不执行 -->
+            <aop:after-returning method="AfterAdvice" pointcut-ref="p5"/>
+
             <!-- 配置环绕通知 -->
-            <!-- <aop:around method="myarround" pointcut-ref="mypoint"/>-->
+            <aop:around method="AroundAdvice" pointcut-ref="p5"/>
         </aop:aspect>
     </aop:config>
 

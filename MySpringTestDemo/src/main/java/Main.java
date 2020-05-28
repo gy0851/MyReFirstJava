@@ -6,6 +6,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import java.util.Arrays;
+
+
 /**
  * @author GeYao
  * @create 2020-05-25 - 15:57
@@ -46,12 +49,17 @@ public class Main {
         for(String str:sts){
             System.out.println(str);
         }*/
-        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
+        //用于schema-base和AspectJ的aop测试demo
+        /*ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
         GoClass gc = ac.getBean("gc", GoClass.class);
         gc.setScore("123");
-        gc.gotoClass("sdf");
+        gc.gotoClass("sdfsdfsdfsdfsdf");
         gc.listen();
-        gc.sleep();
-
+        gc.sleep();*/
+        //基于注解的aop测试demo
+        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
+        com.ggyy0851.doshomethingbyat.GoClass g = ac.getBean("GoClass",com.ggyy0851.doshomethingbyat.GoClass.class);
+        g.HaveALesson();
+        g.HaveALesson("数学");
     }
 }
