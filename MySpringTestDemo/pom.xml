@@ -68,10 +68,17 @@
             <artifactId>aspectjrt</artifactId>
             <version>1.9.5</version>
         </dependency>
+        <!-- cglib动态代理包 -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>3.3.0</version>
+        </dependency>
+        <!-- cglib动态代理包 -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>7.1</version>
         </dependency>
         <!-- mybatis核心包 -->
         <dependency>

@@ -49,6 +49,7 @@
     <orderEntry type="library" exported="" name="Maven: mysql:mysql-connector-java:8.0.15" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.google.protobuf:protobuf-java:3.6.1" level="project" />
     <orderEntry type="library" exported="" name="mylib" level="project" />
-    <orderEntry type="library" name="spring-aop" level="project" />
+    <orderEntry type="library" exported="" name="spring-aop" level="project" />
+    <orderEntry type="library" exported="" name="asm-7.1" level="project" />
   </component>
 </module>

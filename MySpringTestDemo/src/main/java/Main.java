@@ -57,9 +57,9 @@ public class Main {
         gc.listen();
         gc.sleep();*/
         //基于注解的aop测试demo
-        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
+        /*ApplicationContext ac = new ClassPathXmlApplicationContext("spring-config.xml");
         com.ggyy0851.doshomethingbyat.GoClass g = ac.getBean("GoClass",com.ggyy0851.doshomethingbyat.GoClass.class);
         g.HaveALesson();
-        g.HaveALesson("数学");
+        g.HaveALesson("数学");*/
     }
 }
