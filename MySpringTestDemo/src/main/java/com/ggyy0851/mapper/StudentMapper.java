@@ -10,6 +10,5 @@ import java.util.List;
  * @create 2020-05-26 - 16:36
  */
 public interface StudentMapper {
-    @Select("select * from student")
-    List<SimpleStudent> selAll();
+    public SimpleStudent selbyname(String name);
 }

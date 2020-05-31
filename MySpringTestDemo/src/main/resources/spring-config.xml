@@ -7,23 +7,96 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop
        http://www.springframework.org/schema/aop/spring-aop.xsd
        http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <context:property-placeholder location="classpath:log4j.properties,classpath:mydb.properties" />
 
     <!-- 使用注解时需要使用context:component-scan来对包进行扫描，多个包可以用逗号分隔 -->
-    <!--  该包扫描器用于获取bean的注解，扫描该包下带有@component注解的类并将其注解为bean -->
+    <!-- 该包扫描器用于获取注解，包下带有@component注解的类并将其注解为bean,带有@value("${key}")取出value值等等 -->
+    <!-- @Component 用于注册为bean，作用在类名之上。告诉spring这个类将作为一个组件进行注册，spring会沿着该被注解的类所拥有的
+        其他类的路径进行搜索，并统统注册入spring的容器，如果滥用该注解可能会导致spring注册了大量无用的bean-->
+    <!-- @bean 用于注册bean，作用在方法上（并且该类需要@Configuration注解在类上），向spring标明该方法返回的类将被注册为bean，
+        可进行别名等精细化设置，常用于对第三方jar包里给过来的类进行包装注册（因为不需要到jar包里添加component注解）-->
+    <!-- @Repository，与component类似，但主要写在数据访问层上(如hibernate)，起到的作用也是注册为bean -->
+    <!-- @Controller，与component类似，但主要写在控制器上(springMVC)，注册为bean的意思 -->
+    <!-- @Resource，与autowired类似，由jdk提供，作用在属性上，使用此标签无需实现get/set方法。
+        默认按照ByName进行注入，如果找不到则按照ByType注入 -->
+    <!-- @Autowired，与Resource类似，由spring提供，作用在属性上，无需实现get/set方法
+        默认按照Bytype进行，找不到再去byName-->
+    <!-- @Value() spring从容器中获取某个值${key}，并将其注入到@value所注解的属性上-->
+    <!-- @Aspect 切面注解，作用于类名上，定义某个类为切面类-->
+    <!-- @Pointcut() 切点注解，作用于方法名上，通过execution()关键字定义某个类的若干方法被视为连接点可被切入。-->
+    <!-- @Before() 前置通知注解，需要注明具体哪个切点用到这个注解-->
+    <!-- @After 后置通知，其他同上-->
+    <!-- @AfterReturning 后置通知，但有异常时会中断，其他同上-->
+    <!-- @AfterThrowing 异常通知-->
+    <!-- @Around 环绕通知-->
     <context:component-scan base-package="com.ggyy0851.doshomethingbyat"/>
 
-    <!-- proxy-target-class属性为"true"时，使用cglib动态进行代理，为false时为jdk动态代理 -->
+
+    <!--  事务，指定开启事务的管理类 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--  事务是基于切面的，所以此处和切面配置类似，具体切面信息和其他aop一致
+          作用是，当该切面出现了以下方法时，进行事务管理-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 可使用通配符去进行有限度的匹配,只要该通知txadvice所拥有的方法 -->
+            <!-- read-only=true属性可用于只查询的方法，有助于性能提高,而有增删改的操作的则不要设置此属性 -->
+            <tx:method name="ins*" />
+
+            <!-- propagation值确定了事务的传播
+                 设定为required，则将受影响的方法置于一个事务中（如果此时没有事务则新建一个），嵌套在该
+                 方法中的其他方法也被置于同一个事务中。-->
+            <!-- 设定为supports，受影响的方法在执行时，如果当前有事务（因为该方法可被嵌套在其他有事务的方法中），
+                 则置于事务中，如果当前没有事务，则不置于事务中。 -->
+            <!-- 设定为mandatory，受影响的方法必须有事务，如果已经有事务则置于当前事务中，没有事务开启则报错-->
+            <!-- 设定为required_new，受影响方法必定会新建事务，之前的事务会被挂起，当本事务执行完毕后才执行原事务
+                 内外事务互不干扰-->
+            <!-- 设定为not_supported,受影响方法必定在非事务状态下执行，如果之前有事务，则事务挂起，本方法执行完毕后继续事务-->
+            <!-- 设定为never，受影响方法必定在非事务状态下执行，如果有事务，则报错-->
+            <!-- 设定为nested，必须在事务状态下进行，如果没有事务则新建事务，已有事务则嵌套一个事务，子母事务有从属关系
+                （如果子事务回滚，也是回滚到子事务的开始阶段而非母事务的开始阶段）-->
+            <tx:method name="del*" propagation="REQUIRED"/>
+
+            <!-- 控制隔离级别的属性：isolation -->
+            <!-- default，交给底层数据库判断事务的隔离级别 -->
+            <!-- read_uncommitted，可读取到未提交数据，可能脏读，不可重复读，幻读，但效率最高 -->
+            <!-- read_commiteed，只能读取其他事务已提交的数据，防止脏读，可能不可重复读，幻读 -->
+            <!-- repeatable_read，读取的数据被加锁，防止其他事务修改此数据，防止不可重复读、脏读，可能幻读 -->
+            <!-- serializable,排队操作，对整个表添加锁，一个事务处理完这个表后其他事务才能处理这个表，最安全，但效率最低 -->
+            <!--  -->
+            <tx:method name="update*" isolation="DEFAULT"/>
+
+            <!-- rollback-for回滚操作 -->
+            <!-- 可设定的值为具体的异常类路径，即遇到指定异常时进行回滚 -->
+            <!-- 系统默认遇到Exception类都进行回滚，但如果是手动throw异常则有可能不会滚，需要手动设置这个值 -->
+            <!-- no-rollback-for 不回滚操作-->
+            <!-- 和rollback-for一样，但是这个属性用来指定遇到某些异常也不进行回滚操作，比如空指针异常-->
+            <tx:method name="updateMany*" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- proxy-target-class属性为"true"时，使用cglib动态进行代理，为false时为jdk动态代理 ,spring默认是jdk代理的，当获取
+    bean并进行类型转换报错说proxy相关时，一般就是这里的问题，导致获得的bean其实是jdk代理通过反射获得的Proxy类，进行强制转换会报错
+        如果使用cglib进行处理，由于cglib的代理类是源类型的子类，所以不会出现强制转换时的错误,当使用Aop功能时才会出现代理，
+        不用Aop功能则不会使用代理类-->
     <aop:aspectj-autoproxy proxy-target-class="true" />
 
     <!-- application获得bean是通过id获取的，class则是具体bean所对应的class文件 -->
     <!-- 通过IoC的方式将他们交给Spring进行管理 核心就context,core,bean和expression-->
-    <bean id = "student" class="com.ggyy0851.pojo.Student">
+    <!-- bean的scope属性，默认singleton,在spring容器中只有一个，不论获取多少次都只有一个。
+                             prototype，多个，每次申请获取该bean都会new一个出来。
+                             在spring mvc中还有request,session,application,针对这几个作用域的单例模式-->
+    <bean id = "student" class="com.ggyy0851.pojo.Student" scope="prototype">
 
         <!-- ref引用另一个bean，value则是基本数据类型或者String之类 -->
         <!-- name指定构造方法的形参名，index指定构造方法的第N个位置（从0开始），type指定这个形参的类型（int、long等）-->
@@ -50,6 +123,14 @@
     <bean id = "normal_student" class="com.ggyy0851.pojo.Student">
 
         <!-- 简单数据类型可通过此种方式进行set注入 -->
+        <!-- 当需要"引用"其他类对象进行自动注入时，需要在bean中设置autowire属性，default所指向的值可在文件头beans中设置，default-autowire
+             设定为byName时按照beanid进行注入，或者在spring容器中找（比如扫描器扫到的mapper），byType时按照类对象类型注入，但需要注入多个类而类型都相同时会报错
+             设定为constructor时，会按照byname去检索并注入到有参构造方法中-->
+        <!-- 当使用自动注入时需要注意，ref所引用的对象优先级很高，会使得相关的对象很早就被实例化，而某些类对象在实例化时是需
+        要等待其他配置文件加载完毕才能获得数据的，比如jdbc使用了properties获取基础数据时，过早的实例化会导致properties文件还
+        未加载就被实例化然后导致取不到jdbc连接的信息然后报错，所以使用自动注入时需要谨慎地关注ref所在的位置。
+        可以使用避免ref引用的方式去对这种类进行关联，比如注入的是String而非ref时，实例化的顺序就会排在后面，此时可能配置文件已经
+        加载完毕了，从而避免了报错-->
         <property name="id">
             <value>10</value>
         </property>
@@ -89,18 +170,20 @@
 
     <!-- 数据库的数据源配置 用于做数据源的是jdbc,orm,oxm,jms和transaction，属于spring数据管理层的包-->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="url" value="jdbc://mysql://mydb:3306"/>
-        <property name="username" value="root"/>
-        <property name="password" value="root"/>
-        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
     </bean>
 
     <!-- 这是mybatis的用于给spring注册的包，属于mybatis包 -->
     <bean id="databasefactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+        <!-- 这里是导入Pojo包，指定具体的映射 -->
+        <property name="typeAliasesPackage" value="com.ggyy0851.pojo"></property>
     </bean>
 
-    <!-- 这是mybatis的用于给Spring管理mybatis的各类配置文件的包 -->
+    <!-- 这是mybatis的用于给Spring管理mybatis的mapper配置文件的包 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ggyy0851.mapper"/>
         <property name="sqlSessionFactoryBeanName" value="databasefactory"/>
@@ -114,6 +197,9 @@
     <bean id="ex" class="com.ggyy0851.dosomething.DoWrong"/>
     <bean id="do" class="com.ggyy0851.dosomething.DoThings" />
     <bean id="around" class="com.ggyy0851.dosomething.Thinking"/>
+    <bean id="studentservice" class="com.ggyy0851.Serviceimpl.StudentService">
+        <property name="studentMapper" ref="studentMapper"/>
+    </bean>
 
     <!-- 基于Schema-based的配置方法 -->
     <aop:config>
@@ -132,6 +218,7 @@
         <aop:advisor advice-ref="a1" pointcut-ref="p2"/>
         <aop:advisor advice-ref="ex" pointcut-ref="p3"/>
         <aop:advisor advice-ref="around" pointcut-ref="p4"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="p4"/>
 
         <!-- 基于AspectJ的配置方法 -->
         <!--配置切面-->

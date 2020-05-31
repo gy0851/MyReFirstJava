@@ -8,7 +8,7 @@ import net.sf.cglib.proxy.Enhancer;
  */
 public class Test2 {
     public static void main(String[] args) {
-        Enhancer enhancer = new Enhancer();
+        /*Enhancer enhancer = new Enhancer();
         //设置被代理类
         enhancer.setSuperclass(Master.class);
         //设置代理类的对象
@@ -16,6 +16,6 @@ public class Test2 {
         Master master = (Master)enhancer.create();
         master.fight();
         System.out.println("-----------------------------------------");
-        master.fly();
+        master.fly();*/
     }
 }
